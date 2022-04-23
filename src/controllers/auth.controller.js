@@ -1,13 +1,15 @@
 import { User } from "../models/user.model"
 import { newToken } from "../utils/middlerwares/authverify";
 import bcrypt from "bcrypt";
+
+// ^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$
+
 export async function signUp(req,res){
   try {
     //registers for new users
     const { email, password } = req.body;
     //verify if the user is in the database
     let userIn = await User.findOne({email});
-    console.log(userIn)
     if(userIn){
       return res.status(400).json({message: "El email ya está en uso, prueba otro"});
     }
@@ -16,7 +18,7 @@ export async function signUp(req,res){
     const user = await User.create({email, password: encryptPassword});
     
     if(!user){
-      return res.status(400).json({message: "we can¿t created the user"});
+      return res.status(400).json({message: "we can't created the user"});
     }
     //then token is generated
     const token = newToken(user);
@@ -28,8 +30,7 @@ export async function signUp(req,res){
     })
     .json({email});
   } catch (e) {
-    //res.status(400).json({ message: "El usuario no pudo ser creado" });
-    throw new Error(e)
+    res.status(400).json({ message: "El usuario no pudo ser creado" });
   }
 }
 

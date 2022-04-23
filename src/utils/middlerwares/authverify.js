@@ -43,6 +43,6 @@ export async function isAuthenticated(req, res, next) {
       return res.status(404).json({ message: "Your token is empty" });
     }
   } catch (e) {
-    res.status(404).json({ message: "Your token is not verified" });
+    res.status(400).json({ message: "Your token is not verified" });
   }
 }

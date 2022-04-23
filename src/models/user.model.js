@@ -9,17 +9,11 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  favsList: {
-    name: {
-      type: String,
-      required: false,
-    },
-    content: {
-      type: [{type: Schema.Types.ObjectId, ref: "Fav",}],
-      required: false,
-      default: [],
-    },
-  }
+  favsLists: {
+    type: [{type: Schema.Types.ObjectId, ref: "List"}],
+    required: false,
+    default: [],
+  },
 })
 
 const User = model("User", userSchema);
