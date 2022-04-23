@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import {Schema, model} from "mongoose";
 
-const favSchema = new mongoose.Schema({
+const favSchema = new Schema({
   title: {
     type: String,
     required: true,
@@ -15,5 +15,5 @@ const favSchema = new mongoose.Schema({
   }
 })
 
-const Fav = mongoose.model("Fav", favSchema);
+const Fav = model("Fav", favSchema);
 export default Fav;

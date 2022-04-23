@@ -1,23 +1,25 @@
-import { User } from "../models/user.model.js";
-import { newToken } from "../utils/middlerwares/authverify.js";
+import { User } from "../models/user.model"
+import { newToken } from "../utils/middlerwares/authverify";
 import bcrypt from "bcrypt";
 export async function signUp(req,res){
   try {
     //registers for new users
     const { email, password } = req.body;
     //verify if the user is in the database
-   /*  const userIn = await User.findOne({email});
+    let userIn = await User.findOne({email});
+    console.log(userIn)
     if(userIn){
       return res.status(400).json({message: "El email ya está en uso, prueba otro"});
-    } */
+    }
     //if pass first test then create a new user
     const encryptPassword = await bcrypt.hash(password, 8);
     const user = await User.create({email, password: encryptPassword});
-    console.log("usuario generado")
-    console.log(user);
+    
+    if(!user){
+      return res.status(400).json({message: "we can¿t created the user"});
+    }
     //then token is generated
     const token = newToken(user);
-    console.log("token generated")
     //return the email of the new user
     res.status(200).cookie("SECURE_ACCESS",token, {
       httpOnly: true,
@@ -26,7 +28,8 @@ export async function signUp(req,res){
     })
     .json({email});
   } catch (e) {
-    res.status(400).json({ message: "El usuario no pudo ser creado" });
+    //res.status(400).json({ message: "El usuario no pudo ser creado" });
+    throw new Error(e)
   }
 }
 
@@ -53,8 +56,7 @@ export async function signIn(req, res) {
     // response the token for the user
     const token = newToken(user);
 
-    res
-      .status(200)
+    res.status(200)
       .cookie("SECURE_ACCESS", token, {
         httpOnly: true,
         path: "/",
