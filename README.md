@@ -1,4 +1,4 @@
-# backend-assesment
+# FAVS API
 
 This API was build to use for anybody. The instuctions to use well are show below:
 
