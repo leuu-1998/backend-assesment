@@ -9,18 +9,19 @@ export const newToken = (user) => {
 };
 
 export const verifyToken = (token) => {
-  return new Promise((resolve, reject)=>{
-    jwt.verify(token,config.secrets.jwt,(err,payload)=>{
-      if(err) return reject(err);
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, config.secrets.jwt, (err, payload) => {
+      if (err) return reject(err);
       resolve(payload);
-    })
-  })
-}
+    });
+  });
+};
 
 export async function isAuthenticated(req, res, next) {
   try {
     //verify the token
-    const token = req.cookies.SECURE_ACCESS;
+    const token = req.rawHeaders[1];
+
     //const queries = req.query;
     if (!token) {
       return res.status(404).json({ message: "You have to send the token" });
@@ -36,7 +37,6 @@ export async function isAuthenticated(req, res, next) {
     if (payload) {
       //put in the req body to do all we want with the user
       req.body.id = payload.id;
-      req.body.email = payload.email;
       //once middleware finished, pas the next controller
       next();
     } else {

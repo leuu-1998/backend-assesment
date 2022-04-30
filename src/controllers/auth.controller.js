@@ -1,34 +1,47 @@
-import { User } from "../models/user.model"
+import { User } from "../models/user.model";
 import { newToken } from "../utils/middlerwares/authverify";
 import bcrypt from "bcrypt";
 
 // ^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$
 
-export async function signUp(req,res){
+export async function signUp(req, res) {
   try {
+    const verifyPass = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
     //registers for new users
     const { email, password } = req.body;
     //verify if the user is in the database
-    let userIn = await User.findOne({email});
-    if(userIn){
-      return res.status(400).json({message: "El email ya está en uso, prueba otro"});
+    let userIn = await User.findOne({ email });
+    if (userIn) {
+      return res
+        .status(400)
+        .json({ message: "El email ya está en uso, prueba otro" });
     }
+    //verify password
+    if (!verifyPass.test(password)) {
+      return res.status(400).json({
+        message:
+          "your password must contain,one uppercase letter,one simbol and one number. Also must be at least 8 characters",
+      });
+    }
+
     //if pass first test then create a new user
     const encryptPassword = await bcrypt.hash(password, 8);
-    const user = await User.create({email, password: encryptPassword});
-    
-    if(!user){
-      return res.status(400).json({message: "we can't created the user"});
+    const user = await User.create({ email, password: encryptPassword });
+
+    if (!user) {
+      return res.status(400).json({ message: "we can't created the user" });
     }
     //then token is generated
     const token = newToken(user);
     //return the email of the new user
-    res.status(200).cookie("SECURE_ACCESS",token, {
-      httpOnly: true,
-      path: "/",
-      secure: true,
-    })
-    .json({email});
+    res
+      .status(200)
+      .cookie("SECURE_ACCESS", token, {
+        httpOnly: true,
+        path: "/",
+        secure: true,
+      })
+      .json({ token });
   } catch (e) {
     res.status(400).json({ message: "El usuario no pudo ser creado" });
   }
@@ -57,14 +70,14 @@ export async function signIn(req, res) {
     // response the token for the user
     const token = newToken(user);
 
-    res.status(200)
+    res
+      .status(200)
       .cookie("SECURE_ACCESS", token, {
         httpOnly: true,
         path: "/",
         secure: true,
       })
-      .json({ email: user.email }); // here also return the user body
-
+      .json({ token }); // here also return the user body
   } catch (e) {
     res.status(400).json({ message: "No se pudo autenticar" });
   }
